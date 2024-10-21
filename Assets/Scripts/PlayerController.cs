@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour
     private const float LANE_DISTANCE = 2.0f;
     private const float TURN_SPEED = 0.05f;
 
-    //
+    // movement condition
     private bool isRunning = false;
 
     private Animator anim;
@@ -17,13 +17,19 @@ public class PlayerController : MonoBehaviour
     private float jumpForce = 5.0f;
     private float gravity = 12.0f;
     private float verticalVelocity;
-    private float speed = 6.0f;
     private int desiredLane = 1; // 0 = left, 1 = middle, 2 = right
 
-    
+    // speed modifier
+    private float originalSpeed = 6.0f;
+    private float speed;
+    private float speedIncreaseLastTick;
+    private float speedIncreaseTime = 2.5f;
+    private float speedIncreaseAmount = 0.1f;
+
     // Start is called before the first frame update
     void Start()
     {
+        speed = originalSpeed;
         characterController = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
     }
@@ -33,6 +39,13 @@ public class PlayerController : MonoBehaviour
     {
         if (!isRunning)
             return;
+
+        if (Time.time - speedIncreaseLastTick > speedIncreaseTime)
+        {
+            speedIncreaseLastTick = Time.time;
+            speed += speedIncreaseAmount;
+            GameManager.Instance.UpdateModifier(speed - originalSpeed);
+        }
 
         // Get input on which lane to be
         if (MobileInput.Instance.SwipeLeft)
@@ -77,6 +90,7 @@ public class PlayerController : MonoBehaviour
             {
                 // slide
                 StartSliding();
+                Invoke("StopSliding", 1.0f);
             }
         }
         else
@@ -127,5 +141,36 @@ public class PlayerController : MonoBehaviour
     {
         isRunning = true;
         anim.SetTrigger("StartRunning");
+    }
+
+    public void StartSliding()
+    {
+        anim.SetBool("Sliding", true);
+        characterController.height /= 2;
+        characterController.center = new Vector3(characterController.center.x,
+            characterController.center.y / 2, characterController.center.z);
+    }
+
+    private void StopSliding()
+    {
+        anim.SetBool("Sliding", false);
+        characterController.height *= 2;
+        characterController.center = new Vector3(characterController.center.x,
+            characterController.center.y * 2, characterController.center.z);
+    }
+
+    private void Crash()
+    {
+        anim.SetTrigger("Death");
+        isRunning = false;
+    }
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        switch (hit.gameObject.tag)
+        {
+            case "Obstacle":
+                Crash();
+            break;
+        }
     }
 }

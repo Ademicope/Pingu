@@ -6,6 +6,7 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+    private const int COIN_SCORE_AMOUNT = 5;
     public static GameManager Instance { get; set; }
 
     private bool isGameStarted = false;
@@ -18,8 +19,12 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        UpdateScores();
+        modifierScore = 1.0f;
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        //UpdateScores();
+        scoreText.text = score.ToString("0");
+        coinText.text = coinScore.ToString("0");
+        modifierText.text = "x" + modifierScore.ToString("0.0");
     }
 
     // Start is called before the first frame update
@@ -36,12 +41,31 @@ public class GameManager : MonoBehaviour
             isGameStarted = true;
             playerController.StartRunning();
         }
+
+        if (isGameStarted)
+        {
+            // bump score up
+            score += (Time.deltaTime * modifierScore);
+            scoreText.text = score.ToString("0");
+        }
     }
 
-    public void UpdateScores()
+    /*public void UpdateScores()
     {
         scoreText.text = score.ToString();
         coinText.text = coinScore.ToString();
-        modifierText.text = modifierScore.ToString();
+        modifierText.text = "x" + modifierScore.ToString("0.0");
+    }*/
+
+    public void GetCoin()
+    {
+        coinScore += COIN_SCORE_AMOUNT;
+        coinText.text = coinScore.ToString("0");
+    }
+
+    public void UpdateModifier(float modifierAmount)
+    {
+        modifierScore = 1.0f + modifierAmount;
+        modifierText.text = "x" + modifierScore.ToString("0.0");
     }
 }
