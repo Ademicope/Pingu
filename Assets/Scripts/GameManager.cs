@@ -16,12 +16,13 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI scoreText, coinText, modifierText;
     private float score, coinScore, modifierScore;
 
+    private int lastScore;
+
     private void Awake()
     {
         Instance = this;
         modifierScore = 1.0f;
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-        //UpdateScores();
         scoreText.text = score.ToString("0");
         coinText.text = coinScore.ToString("0");
         modifierText.text = "x" + modifierScore.ToString("0.0");
@@ -45,22 +46,22 @@ public class GameManager : MonoBehaviour
         if (isGameStarted)
         {
             // bump score up
+            
             score += (Time.deltaTime * modifierScore);
-            scoreText.text = score.ToString("0");
+            if (lastScore != (int)score)
+            {
+                lastScore = (int)score;
+                scoreText.text = score.ToString("0");
+            }
         }
     }
 
-    /*public void UpdateScores()
-    {
-        scoreText.text = score.ToString();
-        coinText.text = coinScore.ToString();
-        modifierText.text = "x" + modifierScore.ToString("0.0");
-    }*/
-
     public void GetCoin()
     {
-        coinScore += COIN_SCORE_AMOUNT;
+        coinScore++;
         coinText.text = coinScore.ToString("0");
+        score += COIN_SCORE_AMOUNT;
+        scoreText.text = score.ToString("0");
     }
 
     public void UpdateModifier(float modifierAmount)
