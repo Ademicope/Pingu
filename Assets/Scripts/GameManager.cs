@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     private const int COIN_SCORE_AMOUNT = 5;
     public static GameManager Instance { get; set; }
 
+    public bool IsDead {  get; set; }
     private bool isGameStarted = false;
     private PlayerController playerController;
 
@@ -17,6 +18,10 @@ public class GameManager : MonoBehaviour
     private float score, coinScore, modifierScore;
 
     private int lastScore;
+
+    // Death menu
+    public Animator deathMenuAnim;
+    public TextMeshProUGUI deadScoreText, deadCoinText;
 
     private void Awake()
     {
@@ -43,10 +48,9 @@ public class GameManager : MonoBehaviour
             playerController.StartRunning();
         }
 
-        if (isGameStarted)
+        if (isGameStarted && !IsDead)
         {
             // bump score up
-            
             score += (Time.deltaTime * modifierScore);
             if (lastScore != (int)score)
             {
@@ -68,5 +72,18 @@ public class GameManager : MonoBehaviour
     {
         modifierScore = 1.0f + modifierAmount;
         modifierText.text = "x" + modifierScore.ToString("0.0");
+    }
+
+    public void OnPlayButton()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("GameScene");
+    }
+
+    public void OnDeath ()
+    {
+        IsDead = true;
+        deadScoreText.text = score.ToString("0");
+        deadCoinText.text = coinScore.ToString("0");
+        deathMenuAnim.SetTrigger("Dead");
     }
 }
