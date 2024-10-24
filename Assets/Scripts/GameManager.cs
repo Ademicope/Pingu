@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using TMPro.Examples;
 
 public class GameManager : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class GameManager : MonoBehaviour
     private PlayerController playerController;
 
     // UI and the UI fields
+    public Animator gameCanvas;
     public TextMeshProUGUI scoreText, coinText, modifierText;
     private float score, coinScore, modifierScore;
 
@@ -46,6 +48,9 @@ public class GameManager : MonoBehaviour
         {
             isGameStarted = true;
             playerController.StartRunning();
+            FindObjectOfType<GlacierSpawner>().IsScrolling = true;
+            FindObjectOfType<CameraContoller>().IsMoving = true;
+            gameCanvas.SetTrigger("Show");
         }
 
         if (isGameStarted && !IsDead)
@@ -82,6 +87,7 @@ public class GameManager : MonoBehaviour
     public void OnDeath ()
     {
         IsDead = true;
+        FindObjectOfType<GlacierSpawner>().IsScrolling = false;
         deadScoreText.text = score.ToString("0");
         deadCoinText.text = coinScore.ToString("0");
         deathMenuAnim.SetTrigger("Dead");
