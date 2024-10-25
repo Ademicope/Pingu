@@ -5,11 +5,15 @@ using UnityEngine;
 public class Coin : MonoBehaviour
 {
     private Animator anim;
+    private AudioSource coinAudio;
+
+    public AudioClip coinSound;
 
     // Start is called before the first frame update
     private void Awake()
     {
         anim = GetComponent<Animator>();
+        coinAudio = GetComponent<AudioSource>();
     }
 
     private void OnEnable()
@@ -21,6 +25,7 @@ public class Coin : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            coinAudio.PlayOneShot(coinSound, 1.0f);
             GameManager.Instance.GetCoin();
             anim.SetTrigger("Collected");
             //Destroy(gameObject, 1.5f);

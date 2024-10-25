@@ -15,8 +15,8 @@ public class GameManager : MonoBehaviour
     private PlayerController playerController;
 
     // UI and the UI fields
-    public Animator gameCanvas;
-    public TextMeshProUGUI scoreText, coinText, modifierText;
+    public Animator gameCanvas, startMenuAnim;
+    public TextMeshProUGUI scoreText, coinText, modifierText, highScoreText;
     private float score, coinScore, modifierScore;
 
     private int lastScore;
@@ -33,6 +33,8 @@ public class GameManager : MonoBehaviour
         scoreText.text = score.ToString("0");
         coinText.text = coinScore.ToString("0");
         modifierText.text = "x" + modifierScore.ToString("0.0");
+
+        highScoreText.text = PlayerPrefs.GetInt("Highscore").ToString();
     }
 
     // Start is called before the first frame update
@@ -51,6 +53,7 @@ public class GameManager : MonoBehaviour
             FindObjectOfType<GlacierSpawner>().IsScrolling = true;
             FindObjectOfType<CameraContoller>().IsMoving = true;
             gameCanvas.SetTrigger("Show");
+            startMenuAnim.SetTrigger("Hide");
         }
 
         if (isGameStarted && !IsDead)
@@ -91,5 +94,15 @@ public class GameManager : MonoBehaviour
         deadScoreText.text = score.ToString("0");
         deadCoinText.text = coinScore.ToString("0");
         deathMenuAnim.SetTrigger("Dead");
+        gameCanvas.SetTrigger("Hide");
+
+        // check for high score
+        if (score > PlayerPrefs.GetInt("Highscore"))
+        {
+            float s = score;
+            if (s % 1 == 0)
+                s += 1;
+            PlayerPrefs.SetInt("Highscore", (int)s);
+        }
     }
 }

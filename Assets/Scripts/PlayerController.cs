@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private const float LANE_DISTANCE = 2.0f;
-    private const float TURN_SPEED = 0.05f;
+    private const float LANE_DISTANCE = 2.5f;
+    private const float TURN_SPEED = 0.02f;
 
     // movement condition
     private bool isRunning = false;
@@ -26,12 +26,17 @@ public class PlayerController : MonoBehaviour
     private float speedIncreaseTime = 2.5f;
     private float speedIncreaseAmount = 0.1f;
 
+    // Sound
+    private AudioSource playerAudio;
+    public AudioClip crashSound;
+
     // Start is called before the first frame update
     void Start()
     {
         speed = originalSpeed;
         characterController = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
+        playerAudio = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -71,6 +76,8 @@ public class PlayerController : MonoBehaviour
         // calculate move vector
         Vector3 moveVector = Vector3.zero;
         moveVector.x = (targetPosition - transform.position).normalized.x * speed;
+        
+
 
         bool isGrounded = IsGrounded();
         anim.SetBool("Grounded", isGrounded);
@@ -162,6 +169,7 @@ public class PlayerController : MonoBehaviour
     private void Crash()
     {
         anim.SetTrigger("Death");
+        playerAudio.PlayOneShot(crashSound, 1.0f);
         isRunning = false;
         GameManager.Instance.OnDeath();
     }
